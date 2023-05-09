@@ -1,45 +1,12 @@
-/*
-[configuration]
+// For games that are 16:9 and letterboxed to fit a 4:3 screen, this shader will
+// help by zooming the image in to fill a widescreen monitor.
+//
+// To use, set the aspect ratio to force 16:9 in the graphics option, then
+// enable this shader in Post-Processing Effects.
 
-[OptionRangeInteger]
-GUIName = Pixel Scale
-OptionName = PIXEL_SCALE
-MinValue = 1
-MaxValue = 32
-StepAmount = 1,
-DefaultValue = 2
-
-[OptionRangeFloat]
-GUIName = X Axis Alignment
-OptionName = ALIGN_X
-MinValue = 0.0
-MaxValue = 1.0
-StepAmount = 0.05,
-DefaultValue = 0.5
-
-[OptionRangeFloat]
-GUIName = Y Axis Alignment
-OptionName = ALIGN_Y
-MinValue = 0.0
-MaxValue = 1.0
-StepAmount = 0.05,
-DefaultValue = 0.5
-
-[/configuration]
-*/
-
-void main()
-{
-	float pxScale = GetOption(PIXEL_SCALE);
-	float2 align = float2(GetOption(ALIGN_X), GetOption(ALIGN_Y));
-
-	float2 coord = GetCoordinates();
-	float2 res = GetResolution();
-	float2 resInv = GetInvResolution();
-
-	float2 location = (
-		(floor(coord * res / pxScale) * pxScale + (align * pxScale)) * resInv
-	);
-
-	SetOutput(SampleLocation(location));
+void main() {
+    float2 coords = GetCoordinates() - float2(0.5, 0.5);
+    float2 new_coords = float2(coords.x, coords.y*3/4);
+    float2 sample_coords = new_coords + float2(0.5, 0.5);
+    SetOutput(SampleLocation(sample_coords));
 }
